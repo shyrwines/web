@@ -31,7 +31,7 @@ const Td = ({ children, colSpan, alignRight }) => {
   return <td colSpan={colSpan} style={style}>{children}</td>
 }
 
-let CartItems = ({ cartWines, total, tax, dispatch }) => {
+let CartItems = ({ cartWines, total, dispatch }) => {
   return (
     <div className='container'>
       {cartWines.map(wine => {
@@ -60,9 +60,7 @@ let CartItems = ({ cartWines, total, tax, dispatch }) => {
           </div>
         ), <div key={'border' + wine.id} className='d-md-none cart-border w-100 mt-3'/>]
       })}
-      <TotalRow name='Subtotal' value={total}/>
-      <TotalRow name='Tax' value={tax}/>
-      <TotalRow name='Total' value={total + tax}/>
+      <TotalRow name='Subtotal (+ Tax & Shipping)' value={total}/>
     </div>
   )
 }
@@ -200,7 +198,7 @@ class CartPage extends React.Component {
 
   sendEmail(name, email, phone, address, city, state, zipcode, comment) {
     this.setState({error: false, showModal: true, submitted: false})
-    const { cartWines, dispatch, total, tax } = this.props
+    const { cartWines, dispatch, total } = this.props
     const html = (
       <div>
         Name: {name}<br/>
@@ -220,8 +218,6 @@ class CartPage extends React.Component {
             </tr>
           ))}
           <TotalRowEmail name='Subtotal' value={total}/>
-          <TotalRowEmail name='Tax' value={tax}/>
-          <TotalRowEmail name='Total' value={total + tax}/>
         </table>
       </div>
     )
@@ -233,8 +229,6 @@ class CartPage extends React.Component {
 
       ${cartWines.map(wine => `${wine.name}: ${wine.quantity} x ${wine.price} = ${formatPrice(wine.total)}\n`)}
       Subtotal = ${formatPrice(total)}
-      Tax = ${formatPrice(tax)}
-      Total = ${formatPrice(total + tax)}
     `
     const data = {
       html: JSON.stringify(ReactDOMServer.renderToString(html)).slice(1, -1),
@@ -254,7 +248,7 @@ class CartPage extends React.Component {
   }
 
   render() {
-    const { cartWines, loading, tax, total } = this.props
+    const { cartWines, loading, total } = this.props
     const { error, showModal, submitted } = this.state
     return (
       <div>
@@ -264,7 +258,7 @@ class CartPage extends React.Component {
             cartWines === undefined ?
             <div className='text-center'>Your cart is empty!</div> :
             <div>
-              <CartItems cartWines={cartWines} total={total} tax={tax}/>
+              <CartItems cartWines={cartWines} total={total}/>
               <OrderForm sendEmail={this.sendEmail}/>
             </div>
         }
@@ -303,8 +297,7 @@ const mapStateToProps = (state, ownProps) => {
     })
     if (cartWines.length > 0) {
       const { total } = cartWines.reduce((a, b) => ({total: a.total + b.total})) || 0;
-      const tax = 0.0925 * total
-      return { cartWines, loading: false, total, tax }
+      return { cartWines, loading: false, total }
     }
     return { loading: false }
   }
