@@ -1,6 +1,5 @@
 import React from 'react'
 import ReactModal from 'react-modal'
-import ReactDOMServer from 'react-dom/server';
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import queryString from 'query-string'
@@ -11,25 +10,9 @@ const TotalRow = ({ name, value }) => (
   <div className='row height50'>
     <div className="col-8 d-flex align-items-center justify-content-end pr-0">{ name }</div>
     <div className="col-1 d-flex align-items-center justify-content-center px-0">=</div>
-    <div className="col-md-1 col-3 d-flex align-items-center justify-content-end pl-0 pr-md-0">{ formatPrice(value) }</div>
+    <div className="col-md-1 col-3 d-flex align-items-center justify-content-end pl-0 pr-md-0">{formatPrice(value / 100)}</div>
   </div>
 )
-
-const TotalRowEmail = ({ name, value }) => (
-  <tr>
-    <Td colSpan='4' alignRight={true}>{name}</Td>
-    <Td>=</Td>
-    <Td alignRight={true}>{formatPrice(value)}</Td>
-  </tr>
-)
-
-const Td = ({ children, colSpan, alignRight }) => {
-  const style = {paddingRight: '10px'}
-  if (alignRight) {
-    style['textAlign'] = 'right'
-  }
-  return <td colSpan={colSpan} style={style}>{children}</td>
-}
 
 let CartItems = ({ cartWines, total, dispatch }) => {
   return (
@@ -54,9 +37,9 @@ let CartItems = ({ cartWines, total, dispatch }) => {
               />
             </div>
             <div className="col-1 d-flex align-items-center justify-content-center px-0">&times;</div>
-            <div className="col-md-1 col-3 d-flex align-items-center justify-content-end px-0">{ formatPrice(wine.price) }</div>
+            <div className="col-md-1 col-3 d-flex align-items-center justify-content-end px-0">{formatPrice(wine.price / 100)}</div>
             <div className="col-1 d-flex align-items-center justify-content-center px-0">=</div>
-            <div className="col-md-1 col-3 d-flex align-items-center justify-content-end pl-0 pr-md-0">{ formatPrice(wine.total) }</div>
+            <div className="col-md-1 col-3 d-flex align-items-center justify-content-end pl-0 pr-md-0">{formatPrice(wine.total / 100)}</div>
           </div>
         ), <div key={'border' + wine.id} className='d-md-none cart-border w-100 mt-3'/>]
       })}
@@ -72,8 +55,7 @@ class Order extends React.Component {
   onOrderSubmit(e) {
     if (this.form.checkValidity()) {
       e.preventDefault()
-      const { name, email, phone, address, city, state, zipcode, comment } = this.state
-      this.props.sendEmail(name, email, phone, address, city, state, zipcode, comment)
+      this.props.sendEmail(this.state)
     }
   }
 
@@ -196,46 +178,10 @@ class CartPage extends React.Component {
     document.title = 'Cart | Shyr Wines'
   }
 
-  sendEmail(name, email, phone, address, city, state, zipcode, comment) {
+  sendEmail(orderState) {
     this.setState({error: false, showModal: true, submitted: false})
     const { cartWines, dispatch, total } = this.props
-    const html = (
-      <div>
-        Name: {name}<br/>
-        Email: {email}<br/>
-        Phone: {phone}<br/>
-        Address: {address}, {city}, {state} {zipcode}<br/>
-        Comment: {comment}<br/><br/>
-        <table>
-          {cartWines.map(wine => (
-            <tr key={wine.id}>
-              <Td>{wine.name}</Td>
-              <Td>{wine.quantity}</Td>
-              <Td>x</Td>
-              <Td>{formatPrice(wine.price)}</Td>
-              <Td>=</Td>
-              <Td alignRight={true}>{formatPrice(wine.total)}</Td>
-            </tr>
-          ))}
-          <TotalRowEmail name='Subtotal' value={total}/>
-        </table>
-      </div>
-    )
-    const text = `
-      Name: ${name}
-      Email: ${email}
-      Phone: ${phone}
-      Address: ${address}, ${city}, ${state} ${zipcode}
-
-      ${cartWines.map(wine => `${wine.name}: ${wine.quantity} x ${wine.price} = ${formatPrice(wine.total)}\n`)}
-      Subtotal = ${formatPrice(total)}
-    `
-    const data = {
-      html: JSON.stringify(ReactDOMServer.renderToString(html)).slice(1, -1),
-      text: JSON.stringify(text).slice(1, -1),
-      subject: 'Wine order from ' + name
-    }
-    fetch('/sendEmail?' + queryString.stringify(data))
+    fetch('/sendEmail?' + queryString.stringify({...orderState, total, cartWines: JSON.stringify(cartWines)}))
       .then(r => {
         if (r.ok) {
           dispatch(clear())
@@ -292,8 +238,7 @@ const mapStateToProps = (state, ownProps) => {
   if (ownProps.wines) {
     const cartWines = Object.entries(state).map(([id, quantity]) => {
       const wine = ownProps.wines[id]
-      const price = wine.Price / 100
-      return { id, quantity, name: wine.Name, price, total: quantity * price }
+      return { id, quantity, name: wine.Name, price: wine.Price, total: quantity * wine.Price }
     })
     if (cartWines.length > 0) {
       const { total } = cartWines.reduce((a, b) => ({total: a.total + b.total})) || 0;
