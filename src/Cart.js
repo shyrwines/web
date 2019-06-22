@@ -2,7 +2,7 @@ import React from 'react'
 import ReactModal from 'react-modal'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { change, clear, remove } from './actions'
+import { change, remove } from './actions'
 import { formatPrice } from './functions'
 
 const TotalRow = ({ name, value }) => (
@@ -65,15 +65,15 @@ class Order extends React.Component {
         <div className="row">
           <div className="col-md-4 mb-3">
             <label>Name</label>
-            <input className='form-control' type="text" onChange={e => this.setState({name: e.target.value})} required/>
+            <input className='form-control' type="text" onChange={e => this.setState({name: e.target.value})} />
           </div>
           <div className="col-md-5 mb-3">
             <label>Email</label>
-            <input className='form-control' type="email" onChange={e => this.setState({email: e.target.value})} required/>
+            <input className='form-control' type="email" onChange={e => this.setState({email: e.target.value})} />
           </div>
           <div className="col-md-3 mb-3">
             <label>Phone Number</label>
-            <input className='form-control' type="tel" onChange={e => this.setState({phone: e.target.value})} required/>
+            <input className='form-control' type="tel" onChange={e => this.setState({phone: e.target.value})} />
           </div>
         </div>
         <div className="row">
@@ -168,7 +168,7 @@ class CartPage extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = { showModal: false, submitted: false }
+    this.state = { showModal: false }
     this.sendEmail = this.sendEmail.bind(this)
   }
 
@@ -178,16 +178,15 @@ class CartPage extends React.Component {
   }
 
   sendEmail(orderState) {
-    this.setState({error: false, showModal: true, submitted: false})
-    const { cartWines, dispatch, total } = this.props
+    this.setState({error: false, showModal: true})
+    const { cartWines, total } = this.props
     fetch('/createCheckout', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({...orderState, total, cartWines})
+      body: JSON.stringify({...orderState, total, cartWines, redirect_url: window.location.origin})
     }).then(r => {
         if (r.ok) {
-          // dispatch(clear())
-          this.setState({submitted: true})
+          r.text().then(url => window.location.href = url)
         } else {
           this.setState({error: true})
         }
@@ -197,7 +196,7 @@ class CartPage extends React.Component {
 
   render() {
     const { cartWines, loading, total } = this.props
-    const { error, showModal, submitted } = this.state
+    const { error, showModal } = this.state
     return (
       <div>
         <h1 className='text-center'>Cart</h1>
@@ -216,19 +215,14 @@ class CartPage extends React.Component {
           closeTimeoutMS={500}
           isOpen={showModal}
         >
-          {submitted ?
-            <div>
-              <h5>Thanks for your order!</h5>
-              <div className='font-weight-light mb-2'>We'll reach out to you shortly.</div>
-              <button onClick={() => this.setState({showModal: false})}>Close</button>
-            </div> :
+          {
             error ?
               <div>
                 <h5>Sorry, we've encountered an error!</h5>
                 <div className='font-weight-light mb-2'>Please try again later or email <a href='mailto:info@shyrwines.com'>info@shyrwines.com</a>.</div>
                 <button onClick={() => this.setState({showModal: false})}>Close</button>
               </div> :
-              <div>Submitting Order...</div>
+              <div>Taking you to Square checkout...</div>
           }
         </ReactModal>
       </div>
