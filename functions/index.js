@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const nodemailer = require('nodemailer');
 const juice = require('juice');
+const checkoutModule = require('./checkout');
 
 const mailTransport = nodemailer.createTransport({
   service: 'gmail',
@@ -73,3 +74,5 @@ const formatPrice = price => {
   s = price.toString()
   return '$' + s.slice(0, -2) + '.' + s.slice(-2)
 }
+
+exports.createCheckout = checkoutModule.createCheckout;

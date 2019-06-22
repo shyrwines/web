@@ -181,10 +181,13 @@ class CartPage extends React.Component {
   sendEmail(orderState) {
     this.setState({error: false, showModal: true, submitted: false})
     const { cartWines, dispatch, total } = this.props
-    fetch('/sendEmail?' + queryString.stringify({...orderState, total, cartWines: JSON.stringify(cartWines)}))
-      .then(r => {
+    fetch('/createCheckout', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({...orderState, total, cartWines})
+    }).then(r => {
         if (r.ok) {
-          dispatch(clear())
+          // dispatch(clear())
           this.setState({submitted: true})
         } else {
           this.setState({error: true})
@@ -238,7 +241,14 @@ const mapStateToProps = (state, ownProps) => {
   if (ownProps.wines) {
     const cartWines = Object.entries(state).map(([id, quantity]) => {
       const wine = ownProps.wines[id]
-      return { id, quantity, name: wine.Name, price: wine.Price, total: quantity * wine.Price }
+      return {
+        id,
+        quantity,
+        variation_id: wine.variation_id,
+        name: wine.Name,
+        price: wine.Price,
+        total: quantity * wine.Price,
+      }
     })
     if (cartWines.length > 0) {
       const { total } = cartWines.reduce((a, b) => ({total: a.total + b.total})) || 0;
