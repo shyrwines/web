@@ -144,7 +144,7 @@ export default class App extends React.Component {
         </Switch>
 
         <footer className='position-absolute w-100 p-1 text-center'>
-          <span>&copy; 2014 - 2018 Shyr Wines</span>
+          <span>&copy; Shyr Wines</span>
           <span className='d-none d-sm-inline mx-1'>&middot;</span>
           <br className='d-block d-sm-none'/>
           <Link className='text-dark' to='/terms-of-service'>TERMS OF SERVICE</Link>
