@@ -25,3 +25,5 @@ export const removeUndefined = array => {
   }
   return array
 }
+
+export const removeKey = (key, {[key]: _, ...rest}) => rest

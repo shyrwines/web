@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import queryString from 'query-string'
+import querystring from 'querystring'
 import { NotFound } from './Pages'
 import { add } from './actions'
 import { ATTRIBUTES, RATERS } from './constants'
@@ -23,7 +23,7 @@ const Row = ({attribute, value}) => {
     return (
       <div className='d-flex justify-content-between'>
         <h5 className='color'>{attribute}</h5>
-        <h5><Link className='text-dark' to={'/all-wines#' + queryString.stringify({[attribute]: value}) }>{value}</Link></h5>
+        <h5><Link className='text-dark' to={'/all-wines#' + querystring.stringify({[attribute]: value}) }>{value}</Link></h5>
       </div>
     )
   }

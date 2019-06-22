@@ -1,8 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import queryString from 'query-string'
+import querystring from 'querystring'
 import { ATTRIBUTES, RATERS } from './constants'
-import { formatPrice, removeUndefined, staticUrl } from './functions'
+import { formatPrice, removeUndefined, staticUrl, removeKey } from './functions'
 
 const PRICES = {
   'Less than $20': { lower: 0, upper: 2000 },
@@ -79,7 +79,7 @@ class Switch extends React.Component {
         {options.map(o => <Link
           className='d-block text-dark ml-2'
           key={attribute + o}
-          to={'#' + queryString.stringify(Object.assign({}, params, {[attribute]: o}))}
+          to={'#' + querystring.stringify(Object.assign({}, params, {[attribute]: o}))}
         >{o}</Link>)}
       </div>
       ]
@@ -111,7 +111,7 @@ export default class AllWines extends React.Component {
   }
 
   filterWines() {
-    const params = queryString.parse(this.props.location.hash)
+    const params = querystring.parse(this.props.location.hash.substring(1))  // Remove leading #
     const chosen = ATTRIBUTES.filter(a => a in params)
     const unChosen = ATTRIBUTES.filter(a => !(a in params))
 
@@ -166,7 +166,7 @@ export default class AllWines extends React.Component {
                 <div className='d-flex mb-2'>
                   <Link
                     className='text-dark mx-2'
-                    to={'#' + queryString.stringify(Object.assign({}, params, {[a]: undefined}))}
+                    to={'#' + querystring.stringify(removeKey(a, params))}
                   >&times; {params[a]}</Link>
                 </div>
               </div>

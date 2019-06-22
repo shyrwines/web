@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Route, Link, Switch } from 'react-router-dom'
-import queryString from 'query-string'
+import querystring from 'querystring'
 import { About, Contact, NotFound, PrivacyPolicy, TermsOfService } from './Pages'
 import AllWines from './AllWines'
 import Cart from './Cart'
@@ -17,7 +17,7 @@ class AutoComplete extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this)
     this.state = {
       matched: [],
-      query: queryString.parse(this.props.location.hash)['Text Search'] || '',
+      query: querystring.parse(this.props.location.hash.substring(1))['Text Search'] || '',
       showContainer: false
     }
   }
@@ -59,7 +59,7 @@ class AutoComplete extends React.Component {
       this.setState({showContainer: false},
         () => {
           this.refs.searchInput.blur()
-          this.props.history.push('/all-wines#' + queryString.stringify({'Text Search': this.state.query}))
+          this.props.history.push('/all-wines#' + querystring.stringify({'Text Search': this.state.query}))
         })
     }
   }

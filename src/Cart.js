@@ -2,7 +2,6 @@ import React from 'react'
 import ReactModal from 'react-modal'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import queryString from 'query-string'
 import { change, clear, remove } from './actions'
 import { formatPrice } from './functions'
 
