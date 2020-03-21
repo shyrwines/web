@@ -42,7 +42,7 @@ let CartItems = ({ cartWines, total, dispatch }) => {
           </div>
         ), <div key={'border' + wine.id} className='d-md-none cart-border w-100 mt-3'/>]
       })}
-      <TotalRow name='Subtotal (+ Tax & Shipping)' value={total}/>
+      <TotalRow name='Subtotal (before Tax & Shipping)' value={total}/>
     </div>
   )
 }
@@ -60,8 +60,20 @@ class Order extends React.Component {
 
   render() {
     return (
-      <form ref={form => this.form = form} className='container'>
+      <form ref={form => this.form = form} className='container mt-4'>
         <h1 className='text-center'>Order Form</h1>
+        <div className='row'>
+          <div className="col">
+            <div className="form-check form-check-inline">
+              <input className="form-check-input" type="radio" name="method" id="pickup" value="pickup"/>
+              <label className="form-check-label" for="pickup">Pickup</label>
+            </div>
+            <div className="form-check form-check-inline">
+              <input className="form-check-input" type="radio" name="method" id="ship" value="ship"/>
+              <label className="form-check-label" for="ship">Ship</label>
+            </div>
+          </div>
+        </div>
         <div className="row">
           <div className="col-md-4 mb-3">
             <label>Name</label>
@@ -155,7 +167,7 @@ class Order extends React.Component {
             * By submitting this order, you confirm that you are at least the age of 21, and have read and agreed to the <Link to='/terms-of-service'>Terms of Service</Link> and <Link to='/privacy-policy'>Privacy Policy</Link>.
           </div>
           <div className="col-md-3">
-            <button className='w-100 height50' onClick={e => this.onOrderSubmit(e)}>Submit Order</button>
+            <button className='w-100 height50' onClick={e => this.onOrderSubmit(e)}>Place Order</button>
           </div>
         </div>
       </form>
