@@ -43,7 +43,8 @@ let CartItems = ({ cartWines, total, dispatch }) => {
           </div>
         ), <div key={'border' + wine.id} className='d-md-none cart-border w-100 mt-3'/>]
       })}
-      <TotalRow name='Subtotal (+ Tax & Shipping)' value={total}/>
+      <TotalRow name='Estimated Tax' value={total * 0.09}/>
+      <TotalRow name='Subtotal (before shipping)' value={total * 1.09}/>
     </div>
   )
 }

@@ -7,7 +7,7 @@ app.get('/images/*', (req, res) => {
 })
 
 app.get('/wines.json', (req, res) => {
-  res.sendFile(homedir + '/Dropbox/Shyr/cli/wines.json')
+  res.sendFile(__dirname + '/wines.json')
 })
 
 app.get('/wine-images/*', (req, res) => {

@@ -28,9 +28,14 @@ exports.sendEmail = functions.https.onRequest((req, res) => {
           </tr>
         `).join('\n')}
         <tr>
-          <td colspan=4 align=right>Subtotal</td>
+          <td colspan=4 align=right>Estimated Tax</td>
           <td>=</td>
-          <td>${formatPrice(total)}</td>
+          <td>${formatPrice(total * 0.09)}</td>
+        <tr/>
+        <tr>
+          <td colspan=4 align=right>Subtotal (before shipping)</td>
+          <td>=</td>
+          <td>${formatPrice(total * 1.09)}</td>
         <tr/>
       </table>
     </div>
@@ -43,7 +48,8 @@ exports.sendEmail = functions.https.onRequest((req, res) => {
     `Address: ${address}, ${city}, ${state} ${zipcode}`,
     'Comment: ' + comment,
     wines.map(wine => `${wine.name}: ${wine.quantity} x ${formatPrice(wine.price)} = ${formatPrice(wine.total)}`).join('\n'),
-    'Subtotal = ' + formatPrice(total),
+    'Estimated Tax = ' + formatPrice(total * 0.09),
+    'Subtotal (before shipping) = ' + formatPrice(total * 1.09),
   ].join('\n')
 
   const data = {
