@@ -1,14 +1,8 @@
 const functions = require('firebase-functions');
-const nodemailer = require('nodemailer');
+const mailgun = require('mailgun-js');
 const juice = require('juice');
 
-const mailTransport = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: functions.config().gmail.email,
-    pass: functions.config().gmail.password,
-  },
-});
+const mg = mailgun({apiKey: functions.config().mailgun.apikey, domain: 'mg.shyrwines.com'});
 
 exports.sendEmail = functions.https.onRequest((req, res) => {
   const { name, email, phone, address, city, state, zipcode, comment, total, cartWines } = req.query
@@ -52,21 +46,23 @@ exports.sendEmail = functions.https.onRequest((req, res) => {
     'Subtotal = ' + formatPrice(total),
   ].join('\n')
 
-  const mailOptions = {
-    from: 'Order Notifier <noreply@shyrwines.com>',
+  const data = {
+    from: 'Order Notifier <noreply@mg.shyrwines.com>',
     to: 'sanjay@shyrwines.com',
     subject: 'Wine order from ' + name,
     text,
     html: juice(html),
-  };
+  }
 
   console.log('Sending mail with text ' + text);
-  mailTransport.sendMail(mailOptions)
-    .then(() => res.sendStatus(200))
-    .catch(err => {
-      console.log('Encountered error:');
-      console.log(err);
-    });
+  mg.messages().send(data, (error, body) => {
+    if (error) {
+      console.log('Encountered error:')
+      console.log(error)
+    } else {
+      res.sendStatus(200)
+    }
+  })
 });
 
 const formatPrice = price => {
